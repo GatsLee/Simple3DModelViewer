@@ -17,14 +17,14 @@ Window::~Window()
 	glfwTerminate();
 }
 
-int Window::Initialize()
+bool Window::Initialize()
 {
 	// Initialize GLFW
 	if (!glfwInit())
 	{
 		std::cout << "GLFW initialization failed!" << std::endl;
 		glfwTerminate();
-		return 1;
+		return false;
 	}
 
 	// Setup GLFW window properties
@@ -42,7 +42,7 @@ int Window::Initialize()
 	{
 		std::cout << "GLFW window creation failed!" << std::endl;
 		glfwTerminate();
-		return 1;
+		return false;
 	}
 
 	// Get buffer size information
@@ -62,11 +62,11 @@ int Window::Initialize()
 		std::cout << "GLEW initialization failed!" << std::endl;
 		glfwDestroyWindow(mainWindow);
 		glfwTerminate();
-		return 1;
+		return false;
 	}
 
 	// setup viewport size
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
-	return 0;
+	return true;
 }

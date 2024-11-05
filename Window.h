@@ -1,9 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <fstream>
-#include <vector>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <windows.h>
@@ -16,7 +13,7 @@ public:
 
 	GLFWwindow* GetGLFWWindow() { return mainWindow; }
 
-	int Initialize();
+	bool Initialize();
 
 	GLfloat getBufferWidth() const{ return bufferWidth; }
 	GLfloat getBufferHeight() const { return bufferHeight; }
@@ -36,7 +33,7 @@ private:
 	//static void handleKeys(GLFWwindow* window, int key, int code, int action, int mode);
 	//void createKeyCallbacks();
 
-	bool LoadIconBMP(const char* filename, std::vector<unsigned char>& pixelData);
+	//bool LoadIconBMP(const char* filename, std::vector<unsigned char>& pixelData);
 
 };
 
