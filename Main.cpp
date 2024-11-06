@@ -1,13 +1,24 @@
 ﻿// 3DModelViewer.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 #include <iostream>
+#include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+
 #include "Window.h"
 #include "Time.h"
 #include "Mesh.h"
+#include "Shader.h"
+#include "Camera.h"
+#include "Texture.h"
 
 Window mainWindow;
+std::vector <Mesh*> meshList;
+std::vector <Shader*> shaderList;
+Camera mainCamera;
+
+Texture skullTexture;
 
 static const char* vertexShaderPath = "shaders/shader.vert";
 static const char* fragmentShaderPath = "shaders/shader.frag";
@@ -34,6 +45,10 @@ int main()
 		std::cout << "Model failed to load!" << std::endl;
 		return 1;
 	}
+
+	// Load Shader
+	Shader shader;
+	shader.LoadShader(vertexShaderPath, fragmentShaderPath);
 
 	// Loop until window closed
 	while (!glfwWindowShouldClose(mainWindow.GetGLFWWindow()))

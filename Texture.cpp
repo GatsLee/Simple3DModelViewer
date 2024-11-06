@@ -2,7 +2,11 @@
 
 Texture::Texture()
 {
-
+	fileLocation = "";
+	textureID = 0;
+	width = 0;
+	height = 0;
+	bitDepth = 0;
 }
 
 Texture::Texture(std::string fileLocation, std::string fileType)
@@ -34,6 +38,7 @@ Texture::Texture(std::string fileLocation, std::string fileType)
 
 Texture::~Texture()
 {
+	ClearTexture();
 }
 
 bool Texture::LoadTexture()
@@ -56,7 +61,7 @@ bool Texture::LoadTexture()
 		return false;
 	}
 
-	if (!textureData)
+	if (textureData == nullptr)
 	{
 		std::cout << "Error: Failed to load texture" << std::endl;
 		return false;
@@ -78,7 +83,80 @@ bool Texture::LoadTexture()
 	return true;
 }
 
+bool Texture::LoadTextureA()
+{
+	return false;
+}
+
+void Texture::UseTexture()
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+}
+
+void Texture::ClearTexture()
+{
+	glDeleteTextures(1, &textureID);
+	textureID = 0;
+	width = 0;
+	height = 0;
+	delete[] textureData;
+	textureData = nullptr;
+	fileLocation = "";
+}
+
 unsigned char* Texture::ProcessBitMap()
 {
-	return nullptr;
+	std::ifstream file(fileLocation, std::ios::binary);
+	if (!file) {
+		std::cerr << "Error: Could not open BMP file at " << fileLocation << std::endl;
+		return nullptr;
+	}
+
+
+	unsigned char fileHeader[14];
+	file.read(reinterpret_cast<char*>(fileHeader), 14);
+	if (fileHeader[0] != 'B' || fileHeader[1] != 'M')
+	{
+		std::cerr << "Error: Not a valid BMP file" << std::endl;
+		return nullptr;
+	}
+
+	int dataOffset = *reinterpret_cast<int*>(&fileHeader[10]);
+
+	unsigned char infoHeader[40];
+	file.read(reinterpret_cast<char*>(infoHeader), 40);
+
+	width = *reinterpret_cast<int*>(&infoHeader[4]);
+	height = *reinterpret_cast<int*>(&infoHeader[8]);
+	bitDepth = *reinterpret_cast<short*>(&infoHeader[14]);
+
+	if (bitDepth != 24)
+	{
+		std::cerr << "Error: Only 24-bit BMP files are supported" << std::endl;
+		return nullptr;
+	}
+
+	int row_padded = (width * 3 + 3) & (~3);
+	textureData = new unsigned char[row_padded * height];
+
+	file.seekg(dataOffset, std::ios::beg);
+
+	unsigned char* rgbData = new unsigned char[width * height * 3];
+
+	for (int y = 0; y < height; y++)
+	{
+		int rowIndex = (height - 1 - y) * width * 3;
+		file.read(reinterpret_cast<char*>(textureData), row_padded);
+		for (int x = 0; x < width; x++)
+		{
+			int bmpIndex = x * 3;
+			rgbData[rowIndex + bmpIndex] = textureData[bmpIndex + 2];   // R
+			rgbData[rowIndex + bmpIndex + 1] = textureData[bmpIndex + 1]; // G
+			rgbData[rowIndex + bmpIndex + 2] = textureData[bmpIndex];   // B
+		}
+	}
+
+	file.close();
+	return rgbData;
 }

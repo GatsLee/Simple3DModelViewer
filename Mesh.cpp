@@ -62,12 +62,6 @@ bool Mesh::LoadModel(const std::string& fileName)
 			}
 		}
 	}
-
-
-	std::cout << "Vertices: " << vertices.size() << std::endl;
-	std::cout << "UVs: " << uvs.size() << std::endl;
-	std::cout << "Normals: " << normals.size() << std::endl;
-	std::cout << "Faces: " << faces.size() << std::endl;
 	return true;
 }
 
@@ -174,4 +168,8 @@ void Mesh::ClearMesh()
 	uvs.clear();
 	normals.clear();
 	faces.clear();
+}
+
+void Mesh::CalculateAverageNormals(unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount, unsigned int vLength, unsigned int uvLength, unsigned int normalLength)
+{
 }

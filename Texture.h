@@ -11,7 +11,8 @@ public:
 	typedef enum fileType {
 		BMP,
 		JPG,
-		PNG
+		PNG,
+		UNKNOWN
 	} e_fileType;
 
 
