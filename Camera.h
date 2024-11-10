@@ -15,12 +15,12 @@ public:
 	void KeyControl(bool* keys, GLfloat deltaTime);
 	void MouseControl(GLfloat xChange, GLfloat yChange);
 
-	//GatsMath::mat4 CalculateViewMatrix();
-
 	GatsMath::vec3 GetCameraPosition() const { return position; }
 	GatsMath::vec3 GetCameraDirection() const { return forward; }
 
-	//void Update();
+	GatsMath::mat4 CalculateViewMatrix() const;
+
+	void Update();
 
 private:
 	GatsMath::vec3 position;

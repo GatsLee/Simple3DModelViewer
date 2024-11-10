@@ -2,7 +2,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "CommonValues.h"
 
 class Shader
@@ -21,13 +23,16 @@ public:
 	GLuint GetDiffuseIntensityLocation();
 	GLuint GetDirectionLocation();
 	GLuint GetEyePositionLocation();
-	GLuint GetSpecularIntensityLocation();
-	GLuint GetShininessLocation();
+	//GLuint GetSpecularIntensityLocation();
+	//GLuint GetShininessLocation();
 
 	void UseShader();
 	void ClearShader();
 
 private:
+	char *vertexShader;
+	char *fragmentShader;
+
 	int pointLightCount;
 	int spotLightCount;
 
@@ -73,4 +78,8 @@ private:
 		GLuint uniformDirection;
 		GLuint uniformEdge;
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
+
+	char *ReadFile(std::string fileLocation);
+	bool CompileShader();
+	void AddShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
 };

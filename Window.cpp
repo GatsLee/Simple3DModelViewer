@@ -2,8 +2,14 @@
 
 Window::Window(GLint width, GLint height)
 {
-	windowWidth = windowWidth;
+	windowWidth = width;
 	windowHeight = height;
+
+	lastX = 0.0f;
+	lastY = 0.0f;
+	xChange = 0.0f;
+	yChange = 0.0f;
+	mouseFirstMoved = false;
 
 	for (auto& i : keys)
 	{
@@ -69,4 +75,60 @@ bool Window::Initialize()
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
 	return true;
+}
+
+GLfloat Window::GetXChange()
+{
+	return xChange;
+}
+
+GLfloat Window::GetYChange()
+{
+	return yChange;
+}
+
+void Window::CreateCallbacks()
+{
+	glfwSetKeyCallback(mainWindow, HandleKeys);
+	glfwSetCursorPosCallback(mainWindow, HandleMouse);
+}
+
+void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int mode)
+{
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+		{
+			theWindow->keys[key] = true;
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			theWindow->keys[key] = false;
+		}
+	}
+}
+
+void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
+{
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (theWindow->mouseFirstMoved)
+	{
+		theWindow->lastX = xPos;
+		theWindow->lastY = yPos;
+		theWindow->mouseFirstMoved = false;
+	}
+
+	theWindow->xChange = xPos - theWindow->lastX;
+	theWindow->yChange = theWindow->lastY - yPos;
+
+	theWindow->lastX = xPos;
+	theWindow->lastY = yPos;
 }

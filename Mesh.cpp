@@ -15,6 +15,7 @@ Mesh::~Mesh()
 bool Mesh::LoadModel(const std::string& fileName)
 {
 	std::ifstream file(fileName);
+	std::ofstream out("out.txt");
 	if (!file.is_open())
 	{
 		std::cout << "Error: Could not open file " << fileName << std::endl;
@@ -28,6 +29,7 @@ bool Mesh::LoadModel(const std::string& fileName)
 		std::string lineType;
 		ss >> lineType;
 
+		out << "original: " << line << std::endl;
 		if (lineType == "v")
 		{
 			struct Vertex vertex;
@@ -49,19 +51,101 @@ bool Mesh::LoadModel(const std::string& fileName)
 		else if (lineType == "f")
 		{
 			struct Face face;
-			int vertexIndex[3], uvIndex[3], normalIndex[3];
+			float vertexIndex[4], uvIndex[4], normalIndex[4];
 			char slash;
 
-			for (int i = 0; i < 3; i++)
+			// check if face is a quad or triangle
+			int numVertices = 0;
+			std::string temp;
+			std::istringstream ss2(line);
+			while (ss2 >> temp)
 			{
-				ss >> vertexIndex[i] >> slash >> uvIndex[i] >> slash >> normalIndex[i];
-				face.vertexIndices.push_back(vertexIndex[i]);
-				face.textureIndices.push_back(uvIndex[i]);
-				face.normalIndices.push_back(normalIndex[i]);
+				numVertices++;
+			}
+
+			ss.clear();
+			ss.seekg(0, std::ios::beg);
+
+			if (numVertices == 4)
+			{
+				// Triangulate quad
+				for (int i = 0; i < 4; i++) // 4 vertices per face
+				{
+					vertexIndex[i] = uvIndex[i] = normalIndex[i] = 0;
+					ss >> vertexIndex[i] >> slash >> uvIndex[i] >> slash >> normalIndex[i];
+					face.vertexIndices.push_back(vertexIndex[i]);
+					face.textureIndices.push_back(uvIndex[i]);
+					face.normalIndices.push_back(normalIndex[i]);
+				}
+
+				// Triangulate quad
+				struct Face face2;
+				face2.vertexIndices.push_back(face.vertexIndices[0]);
+				face2.vertexIndices.push_back(face.vertexIndices[2]);
+				face2.vertexIndices.push_back(face.vertexIndices[3]);
+				face2.textureIndices.push_back(face.textureIndices[0]);
+				face2.textureIndices.push_back(face.textureIndices[2]);
+				face2.textureIndices.push_back(face.textureIndices[3]);
+				face2.normalIndices.push_back(face.normalIndices[0]);
+				face2.normalIndices.push_back(face.normalIndices[2]);
+				face2.normalIndices.push_back(face.normalIndices[3]);
+
+				face.vertexIndices.pop_back();
+				face.textureIndices.pop_back();
+				face.normalIndices.pop_back();
+
+				faces.push_back(face);
+				faces.push_back(face2);
+			}
+			else if (numVertices == 3)
+			{
+				for (int i = 0; i < 3; i++) // 3 vertices per face
+				{
+					vertexIndex[i] = 0, uvIndex[i] = 0, normalIndex[i] = 0;
+					ss >> vertexIndex[i] >> slash >> uvIndex[i] >> slash >> normalIndex[i];
+					face.vertexIndices.push_back(vertexIndex[i]);
+					face.textureIndices.push_back(uvIndex[i]);
+					face.normalIndices.push_back(normalIndex[i]);
+				}
 				faces.push_back(face);
 			}
+			else
+			{
+			}
+
+
+
+
+
+			for (int i = 0; i < 4; i++) // 4 vertices per face
+			{
+
+			}
+			out << std::endl;
 		}
 	}
+
+	out << "Vertices: " << vertices.size() << std::endl;
+	out << "UVs: " << uvs.size() << std::endl;
+	out << "Normals: " << normals.size() << std::endl;
+	out << "Faces: " << faces.size() << std::endl;
+	
+	file.close();
+
+	out << "VertexIndex" << std::endl;
+
+	for (const Face& face : faces)
+	{
+		out << "Face: ";
+		for (const int& idx : face.vertexIndices)
+		{
+			out << idx << " ";
+		}
+		out << std::endl;
+	}
+
+	out.close();
+
 	return true;
 }
 
@@ -72,35 +156,49 @@ void Mesh::CreateMesh()
 
 	for (const Face& face : faces)
 	{
-		for (size_t i = 0; i < face.vertexIndices.size(); ++i)
+		for (size_t i = 0; i < face.vertexIndices.size(); i++)
 		{
-			int vIdx = face.vertexIndices[i] - 1;
+			int vIdx = face.vertexIndices[i];
+			if (vIdx < 0 || vIdx >= vertices.size())
+			{
+				std::cout << "idx: " << vIdx << " vertices.size(): " << vertices.size() << std::endl; // "Error: Vertex index out of bounds
+				std::cout << "Error: Vertex index out of bounds" << std::endl;
+				continue;
+			}
 			interleavedVertices.push_back(vertices[vIdx].x);
 			interleavedVertices.push_back(vertices[vIdx].y);
 			interleavedVertices.push_back(vertices[vIdx].z);
 
-			if (face.textureIndices.size() > i) {
+			if (face.textureIndices.size() > i)
+			{
 				int uvIdx = face.textureIndices[i] - 1;
-				interleavedVertices.push_back(uvs[uvIdx].u);
-				interleavedVertices.push_back(uvs[uvIdx].v);
+				if (uvIdx >= 0 && uvIdx < uvs.size())
+				{
+					interleavedVertices.push_back(uvs[uvIdx].u);
+					interleavedVertices.push_back(uvs[uvIdx].v);
+				}
+				else
+				{
+					interleavedVertices.push_back(0.0f);
+					interleavedVertices.push_back(0.0f);
+				}
 			}
-			else {
-				interleavedVertices.push_back(0.0f);
-				interleavedVertices.push_back(0.0f);
-			}
-
-			if (face.normalIndices.size() > i) {
+			if (face.normalIndices.size() > i)
+			{
 				int nIdx = face.normalIndices[i] - 1;
-				interleavedVertices.push_back(normals[nIdx].nx);
-				interleavedVertices.push_back(normals[nIdx].ny);
-				interleavedVertices.push_back(normals[nIdx].nz);
+				if (nIdx >= 0 && nIdx < normals.size())
+				{
+					interleavedVertices.push_back(normals[nIdx].nx);
+					interleavedVertices.push_back(normals[nIdx].ny);
+					interleavedVertices.push_back(normals[nIdx].nz);
+				}
+				else
+				{
+					interleavedVertices.push_back(0.0f);
+					interleavedVertices.push_back(0.0f);
+					interleavedVertices.push_back(0.0f);
+				}
 			}
-			else {
-				interleavedVertices.push_back(0.0f);
-				interleavedVertices.push_back(0.0f);
-				interleavedVertices.push_back(0.0f);
-			}
-
 			indices.push_back(indices.size());
 		}
 	}

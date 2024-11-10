@@ -32,7 +32,7 @@ namespace GatsMath
 					data[i][j] = val;
 		}
 
-		mat(vec4<T> v1, vec4<T> v2, vec4<T> v3, vec4<T> v4)
+		mat(vec4 v1, vec4 v2, vec4 v3, vec4 v4)
 		{
 			data[0][0] = v1.x; data[0][1] = v1.y; data[0][2] = v1.z; data[0][3] = v1.w;
 			data[1][0] = v2.x; data[1][1] = v2.y; data[1][2] = v2.z; data[1][3] = v2.w;
@@ -83,9 +83,9 @@ namespace GatsMath
 			return result;
 		}
 
-		vec4<T> operator*(const vec4<T>& v) const
+		vec4 operator*(const vec4& v) const
 		{
-			vec4<T> result;
+			vec4 result;
 			for (int i = 0; i < 4; i++)
 				for (int j = 0; j < 4; j++)
 					result.data[i] += data[i][j] * v.data[j];
@@ -204,7 +204,7 @@ namespace GatsMath
 				+ m.data[0][2] * m.data[1][3] * m.data[2][1] * m.data[3][0] // 02 13 21 30
 				+ m.data[0][3] * m.data[1][0] * m.data[2][1] * m.data[3][2] // 03 10 21 32
 				+ m.data[0][3] * m.data[1][1] * m.data[2][2] * m.data[3][0] // 03 11 22 30
-				+ m.data[0][3] * m.data[1][2] * m.data[2][0] * m.data[3][1]); // 03 12 20 31
+				+ m.data[0][3] * m.data[1][2] * m.data[2][0] * m.data[3][1])); // 03 12 20 31
 	}
 
 	template <typename T>
@@ -252,7 +252,7 @@ namespace GatsMath
 	template <typename T>
 	mat<T, 4, 4> rotate(const mat<T, 4, 4>& m, T angle, const vec3& v)
 	{
-		vec3 nv = normalize(v);
+		vec3 nv = v.normalize();
 
 		if (nv == vec3(1, 0, 0))
 		{
@@ -290,43 +290,43 @@ namespace GatsMath
 			mat<T, 4, 4> result = mat<T, 4, 4>( vec4(t * x * x + c,		t * x * y - s * z,	t * x * z + s * y,	0),
 												vec4(t * x * y + s * z, t * y * y + c,		t * y * z - s * x,	0),
 												vec4(t * x * z - s * y, t * y * z + s * x,	t * z * z + c,		0),
-												vec4(0,					0,					0,					1));)
+												vec4(0,					0,					0,					1));
 
-				return result;
+			return result;
 		}
 	}
 
 	template <typename T>
-	mat<T, 4, 4> perspective(T fov, T aspect, T near, T far)
+	mat<T, 4, 4> perspective(T fov, T aspect, T zNear, T zFar)
 	{
 		mat<T, 4, 4> result;
 
 		result = mat<T, 4, 4>(vec4(1 / (aspect * std::tan(fov / 2)), 0, 0, 0),
-							vec4(0, 1 / std::tan(fov / 2), 0, 0),
-							vec4(0, 0, (far + near) / (near - far), -((2 * far * near) / (far - near)),
-							vec4(0, 0, -1, 0));
+								vec4(0, 1 / std::tan(fov / 2), 0, 0),
+								vec4(0, 0, (zFar + zNear) / (zNear - zFar), -((2 * zFar * zNear) / (zFar - zNear))),
+								vec4(0, 0, -1, 0));
 
 		return result;
 	}
 
 	template <typename T>
-	mat<T, 4, 4> orthographic(T left, T right, T bottom, T top, T near, T far)
+	mat<T, 4, 4> orthographic(T left, T right, T bottom, T top, T zNear, T zFar)
 	{
 		mat<T, 4, 4> result;
 
-		result = mat<T, 4, 4>(vec4(2 / (right - left), 0, 0, -((right + left)/(right - left)),
-							vec4(0, 2 / (top - bottom), 0, -((top + bottom)/(top - bottom)),
-							vec4(0, 0, 2 / (near - far), -((far + near)/(far - near)),
+		result = mat<T, 4, 4>(vec4(2 / (right - left), 0, 0, -((right + left)/(right - left))),
+							vec4(0, 2 / (top - bottom), 0, -((top + bottom)/(top - bottom))),
+							vec4(0, 0, 2 / (zNear - zFar), -((zFar + zNear)/(zFar - zNear))),
 							vec4(0, 0, 0, 1));
 
 		return result;
 	}
 
 	template <typename T>
-	mat<T, 4, 4> lookAt(const vec3& eye, const vec3& center, const vec3& up)
+	mat<T, 4, 4> lookAt(const vec<float, 3>& eye, const vec<float, 3>& center, const vec<float, 3>& up)
 	{
-		vec3 cameraZ = normalize(eye - center);
-		vec3 cameraX = normalize(cross(up, cameraZ));
+		vec3 cameraZ = (eye - center).normalize();
+		vec3 cameraX = cross(up, cameraZ).normalize();
 		vec3 cameraY = cross(cameraZ, cameraX);
 
 		mat<T, 4, 4> result = mat<T, 4, 4>(vec4(cameraX.x, cameraY.x, cameraZ.x, 0),

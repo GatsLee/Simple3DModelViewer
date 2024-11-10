@@ -254,6 +254,16 @@ namespace GatsMath
 			return result;
 		}
 
+		bool operator==(const vec<T, 3>& v) const
+		{
+			return x == v.x && y == v.y && z == v.z;
+		}
+
+		bool operator!=(const vec<T, 3>& v) const
+		{
+			return x != v.x || y != v.y || z != v.z;
+		}
+
 		vec<T, 3> normalize() const
 		{
 			vec<T, 3> result;

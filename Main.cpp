@@ -13,21 +13,20 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "GatsMath.h"
+#include "CommonValues.h"
 
 Window mainWindow;
-//std::vector <Mesh*> meshList;
-//std::vector <Shader*> shaderList;
+Camera mainCamera;
+std::vector <Mesh*> meshList;
+std::vector <Shader*> shaderList;
 //Camera mainCamera;
 
 Texture skullTexture;
 
-static const char* vertexShaderPath = "shaders/shader.vert";
-static const char* fragmentShaderPath = "shaders/shader.frag";
-
 int main()
 {
 	// Initialize Window
-	mainWindow = Window(800, 600);
+	mainWindow = Window(SCREEN_WIDTH_16_9, SCREEN_HEIGHT_16_9);
 
 	if (mainWindow.Initialize() == false)
 	{
@@ -36,14 +35,21 @@ int main()
 	}
 
 	// Load Model
-	//Mesh mesh;
-	//mesh.LoadModel("models/skull.obj");
+	Mesh * mesh = new Mesh();
+	meshList.push_back(mesh);
+	meshList[0]->LoadModel("Models/LibertStatue.obj");
+	meshList[0]->CreateMesh();
 
 	// Load Shader
-	//Shader shader;
-	//shader.LoadShader(vertexShaderPath, fragmentShaderPath);
+	//Shader* shader = new Shader();
+	///shaderList.push_back(shader);
+	//shaderList[0]->CreateFromFiles(VertexShaderPath, FragmentShaderPath);
 
-	GatsMath::vec2 vec(1, 2);
+	// Load Camera
+	//mainCamera = Camera(GatsMath::vec3(0.0f, 0.0f, 0.0f), GatsMath::vec3(0.0f, 1.0f, 0.0f), 
+	//					-90.0f, 0.0f, 5.0f, 0.1f);
+
+	// Initiate uniform variables
 
 	// Loop until window closed
 	while (!glfwWindowShouldClose(mainWindow.GetGLFWWindow()))
@@ -51,8 +57,28 @@ int main()
 		// Get + Handle user input events
 		glfwPollEvents();
 
+		// camera key input
+		//mainCamera.KeyControl(mainWindow.GetKeys(), Time::GetDeltaTime());
+		//mainCamera.MouseControl(mainWindow.GetXChange(), mainWindow.GetYChange());
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//shaderList[0]->UseShader();
+
+		//GatsMath::mat4 model(1.0f);
+
+		//model = GatsMath::translate<float>(model, GatsMath::vec3(0.0f, 0.0f, -2.5f));
+		//model = GatsMath::scale<float>(model, GatsMath::vec3(0.4f, 0.4f, 0.4f));
+		//model = GatsMath::rotate<float>(model, 0.0f, GatsMath::vec3(0.0f, 1.0f, 0.0f));
+
+
+
+		//meshList[0]->RenderMesh();
+
+
 		// Clear window
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glfwSwapBuffers(mainWindow.GetGLFWWindow());

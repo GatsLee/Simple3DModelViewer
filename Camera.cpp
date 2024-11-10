@@ -11,7 +11,7 @@ Camera::Camera()
 	moveSpeed = 1.0f;
 	turnSpeed = 0.1f;
 
-	//Update();
+	Update();
 }
 
 Camera::Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, float startYaw, float startPitch, float MoveSpeed, float startTurnSpeed)
@@ -25,7 +25,7 @@ Camera::Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, float startYaw, 
 	this->moveSpeed = MoveSpeed;
 	this->turnSpeed = startTurnSpeed;
 
-	//Update();
+	Update();
 }
 
 Camera::~Camera()
@@ -85,5 +85,21 @@ void Camera::MouseControl(GLfloat xChange, GLfloat yChange)
 		pitch = -89.0f;
 	}
 
-	//Update();
+	Update();
+}
+
+GatsMath::mat4 Camera::CalculateViewMatrix() const
+{
+	return GatsMath::lookAt<float>(position, position + forward, up);
+}
+
+void Camera::Update()
+{
+	forward.x = cos(GatsMath::ToRadians(yaw)) * cos(GatsMath::ToRadians(pitch));
+	forward.y = sin(GatsMath::ToRadians(pitch));
+	forward.z = sin(GatsMath::ToRadians(yaw)) * cos(GatsMath::ToRadians(pitch));
+	forward = forward.normalize();
+
+	right = GatsMath::cross(forward, worldUp).normalize();
+	up = GatsMath::cross(right, forward).normalize();
 }
