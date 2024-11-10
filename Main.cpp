@@ -41,13 +41,13 @@ int main()
 	meshList[0]->CreateMesh();
 
 	// Load Shader
-	//Shader* shader = new Shader();
-	///shaderList.push_back(shader);
-	//shaderList[0]->CreateFromFiles(VertexShaderPath, FragmentShaderPath);
+	Shader* shader = new Shader();
+	shaderList.push_back(shader);
+	shaderList[0]->CreateFromFiles(VertexShaderPath, FragmentShaderPath);
 
 	// Load Camera
-	//mainCamera = Camera(GatsMath::vec3(0.0f, 0.0f, 0.0f), GatsMath::vec3(0.0f, 1.0f, 0.0f), 
-	//					-90.0f, 0.0f, 5.0f, 0.1f);
+	mainCamera = Camera(GatsMath::vec3(0.0f, 0.0f, 0.0f), GatsMath::vec3(0.0f, 1.0f, 0.0f), 
+						-90.0f, 0.0f, 5.0f, 0.1f);
 
 	// Initiate uniform variables
 

@@ -12,10 +12,33 @@ Mesh::~Mesh()
 {
 }
 
+std::vector<std::string> Mesh::SplitObjLine(const std::string& s, char delimiter)
+{
+	std::vector<std::string> tokens(5, "");
+	int tokenIdx = 0;
+	std::string token;
+
+	for (char c : s)
+	{
+
+		if (c == delimiter)
+		{
+			tokens[tokenIdx] = token;
+			token = "";
+			tokenIdx++;
+		}
+		else
+		{
+			token += c;
+		}
+	}
+	tokens[tokenIdx] = token;
+	return tokens;
+}
+
 bool Mesh::LoadModel(const std::string& fileName)
 {
 	std::ifstream file(fileName);
-	std::ofstream out("out.txt");
 	if (!file.is_open())
 	{
 		std::cout << "Error: Could not open file " << fileName << std::endl;
@@ -29,7 +52,6 @@ bool Mesh::LoadModel(const std::string& fileName)
 		std::string lineType;
 		ss >> lineType;
 
-		out << "original: " << line << std::endl;
 		if (lineType == "v")
 		{
 			struct Vertex vertex;
@@ -51,7 +73,7 @@ bool Mesh::LoadModel(const std::string& fileName)
 		else if (lineType == "f")
 		{
 			struct Face face;
-			float vertexIndex[4], uvIndex[4], normalIndex[4];
+			int vertexIndex[4], uvIndex[4], normalIndex[4];
 			char slash;
 
 			// check if face is a quad or triangle
@@ -66,13 +88,19 @@ bool Mesh::LoadModel(const std::string& fileName)
 			ss.clear();
 			ss.seekg(0, std::ios::beg);
 
-			if (numVertices == 4)
+			if (numVertices == 5) // 4 vertices
 			{
+				std::vector<std::string> chunks = SplitObjLine(line, ' ');
 				// Triangulate quad
 				for (int i = 0; i < 4; i++) // 4 vertices per face
 				{
 					vertexIndex[i] = uvIndex[i] = normalIndex[i] = 0;
-					ss >> vertexIndex[i] >> slash >> uvIndex[i] >> slash >> normalIndex[i];
+
+					// v/t/n : some elements may be missing
+					std::vector<std::string> tokens = SplitObjLine(chunks[i+1], '/');
+					vertexIndex[i] = (tokens[0] == "" ? 0 : std::stoi(tokens[0], nullptr));
+					uvIndex[i] = (tokens[1] == "" ? 0 : std::stoi(tokens[1], nullptr));
+					normalIndex[i] = (tokens[2] == "" ? 0 : std::stoi(tokens[2], nullptr));
 					face.vertexIndices.push_back(vertexIndex[i]);
 					face.textureIndices.push_back(uvIndex[i]);
 					face.normalIndices.push_back(normalIndex[i]);
@@ -97,55 +125,25 @@ bool Mesh::LoadModel(const std::string& fileName)
 				faces.push_back(face);
 				faces.push_back(face2);
 			}
-			else if (numVertices == 3)
+			else if (numVertices == 4) // 3 vertices
 			{
+				std::vector<std::string> chunks = SplitObjLine(line, ' ');
 				for (int i = 0; i < 3; i++) // 3 vertices per face
 				{
 					vertexIndex[i] = 0, uvIndex[i] = 0, normalIndex[i] = 0;
-					ss >> vertexIndex[i] >> slash >> uvIndex[i] >> slash >> normalIndex[i];
+					std::vector <std::string> tokens = SplitObjLine(chunks[i + 1], '/');
+					vertexIndex[i] = (tokens[0] == "" ? 0 : std::stoi(tokens[0], nullptr));
+					uvIndex[i] = (tokens[1] == "" ? 0 : std::stoi(tokens[1], nullptr));
+					normalIndex[i] = (tokens[2] == "" ? 0 : std::stoi(tokens[2], nullptr));
 					face.vertexIndices.push_back(vertexIndex[i]);
 					face.textureIndices.push_back(uvIndex[i]);
 					face.normalIndices.push_back(normalIndex[i]);
 				}
 				faces.push_back(face);
 			}
-			else
-			{
-			}
-
-
-
-
-
-			for (int i = 0; i < 4; i++) // 4 vertices per face
-			{
-
-			}
-			out << std::endl;
 		}
 	}
-
-	out << "Vertices: " << vertices.size() << std::endl;
-	out << "UVs: " << uvs.size() << std::endl;
-	out << "Normals: " << normals.size() << std::endl;
-	out << "Faces: " << faces.size() << std::endl;
-	
 	file.close();
-
-	out << "VertexIndex" << std::endl;
-
-	for (const Face& face : faces)
-	{
-		out << "Face: ";
-		for (const int& idx : face.vertexIndices)
-		{
-			out << idx << " ";
-		}
-		out << std::endl;
-	}
-
-	out.close();
-
 	return true;
 }
 
@@ -158,7 +156,7 @@ void Mesh::CreateMesh()
 	{
 		for (size_t i = 0; i < face.vertexIndices.size(); i++)
 		{
-			int vIdx = face.vertexIndices[i];
+			int vIdx = face.vertexIndices[i] - 1;
 			if (vIdx < 0 || vIdx >= vertices.size())
 			{
 				std::cout << "idx: " << vIdx << " vertices.size(): " << vertices.size() << std::endl; // "Error: Vertex index out of bounds
@@ -271,3 +269,4 @@ void Mesh::ClearMesh()
 void Mesh::CalculateAverageNormals(unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount, unsigned int vLength, unsigned int uvLength, unsigned int normalLength)
 {
 }
+

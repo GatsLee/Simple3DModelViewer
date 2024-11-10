@@ -51,4 +51,6 @@ private:
 	void CalculateAverageNormals(unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount, 
 								unsigned int vLength, unsigned int uvLength, unsigned int normalLength);
 
+	std::vector<std::string> SplitObjLine(const std::string& s, char delimiter);
+
 };
