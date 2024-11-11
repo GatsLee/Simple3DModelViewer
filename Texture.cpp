@@ -108,11 +108,11 @@ void Texture::ClearTexture()
 unsigned char* Texture::ProcessBitMap()
 {
 	std::ifstream file(fileLocation, std::ios::binary);
-	if (!file) {
+	if (!file)
+	{
 		std::cerr << "Error: Could not open BMP file at " << fileLocation << std::endl;
 		return nullptr;
 	}
-
 
 	unsigned char fileHeader[14];
 	file.read(reinterpret_cast<char*>(fileHeader), 14);

@@ -29,7 +29,11 @@ namespace GatsMath
 		{
 			for (int i = 0; i < 4; i++)
 				for (int j = 0; j < 4; j++)
-					data[i][j] = val;
+					data[i][j] = 0;
+			data[0][0] = val;
+			data[1][1] = val;
+			data[2][2] = val;
+			data[3][3] = val;
 		}
 
 		mat(vec4 v1, vec4 v2, vec4 v3, vec4 v4)
@@ -125,9 +129,45 @@ namespace GatsMath
 			vec<T, 4> v(data[index][0], data[index][1], data[index][2], data[index][3]);
 			return v;
 		}
+
+		template <typename T>
+		friend std::ostream& operator<<(std::ostream& os, const mat<T, 4, 4>& m)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				os << "[ ";
+				for (int j = 0; j < 4; j++)
+					os << m.data[i][j] << " ";
+				os << "]\n";
+			}
+			return os;
+		}
 	};
 
+
 	// mat4x4 functions
+	template <typename T>
+	T* value_ptr(mat<T, 4, 4>& m)
+	{
+		T* flatData = new T[16];
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				flatData[i * 4 + j] = m.data[i][j];
+
+		return flatData;
+	}
+
+	template <typename T>
+	const T* value_ptr(const mat<T, 4, 4>& m)
+	{
+		T* flatData = new T[16];
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				flatData[i * 4 + j] = m.data[i][j];
+
+		return flatData;
+	}
+
 	template <typename T>
 	mat<T, 4, 4> transpose(const mat<T, 4, 4>& m)
 	{

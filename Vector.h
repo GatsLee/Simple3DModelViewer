@@ -117,7 +117,7 @@ namespace GatsMath
 		vec<T, 2> normalize() const
 		{
 			vec<T, 2> result;
-			T length = sqrt(x * x + y * y);
+			T length = std::sqrt(std::powf(x, 2) + std::powf(y, 2));
 			result.x = x / length;
 			result.y = y / length;
 			return result;
@@ -267,7 +267,7 @@ namespace GatsMath
 		vec<T, 3> normalize() const
 		{
 			vec<T, 3> result;
-			T length = std::sqrt(x * x + y * y + z * z);
+			T length = std::sqrt(std::powf(x, 2) + std::powf(y, 2) + std::powf(z, 2));
 			result.x = x / length;
 			result.y = y / length;
 			result.z = z / length;
@@ -425,7 +425,7 @@ namespace GatsMath
 		vec<T, 4> normalize() const
 		{
 			vec<T, 4> result;
-			T length = sqrt(x * x + y * y + z * z + w * w);
+			T length = sqrt(std::powf(x, 2) + std::powf(y, 2) + std::powf(z, 2) + std::powf(w, 2));
 			result.x = x / length;
 			result.y = y / length;
 			result.z = z / length;

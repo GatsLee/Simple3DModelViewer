@@ -17,8 +17,8 @@ public:
 
 	bool GetShouldClose() { return glfwWindowShouldClose(mainWindow); }
 
-	GLfloat getBufferWidth() const{ return bufferWidth; }
-	GLfloat getBufferHeight() const { return bufferHeight; }
+	float GetBufferWidth() const{ return static_cast<GLfloat>(bufferWidth); }
+	float GetBufferHeight() const { return static_cast<GLfloat>(bufferHeight); }
 
 	void SwapBuffers() { glfwSwapBuffers(mainWindow); }
 
@@ -30,8 +30,8 @@ public:
 
 private:
 	GLFWwindow* mainWindow;
-	GLint windowWidth, windowHeight;
-	GLint bufferWidth, bufferHeight;
+	GLuint windowWidth, windowHeight;
+	GLuint bufferWidth, bufferHeight;
 	
 	bool keys[1024];
 

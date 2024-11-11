@@ -9,7 +9,8 @@ class Camera
 {
 public:
 	Camera();
-	Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, float startYaw, float startPitch, float MoveSpeed, float startTurnSpeed);
+	Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, 
+			float startYaw, float startPitch, float startMoveSpeed, float startTurnSpeed);
 	~Camera();
 
 	void KeyControl(bool* keys, GLfloat deltaTime);

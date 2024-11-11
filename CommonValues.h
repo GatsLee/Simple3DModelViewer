@@ -3,8 +3,8 @@
 const int MAX_POINT_LIGHTS = 3;
 const int MAX_SPOT_LIGHTS = 3;
 
-static const char* VertexShaderPath = "shaders/shader.vert";
-static const char* FragmentShaderPath = "shaders/shader.frag";
+static const char* VertexShaderPath = "Shaders/shader.vert";
+static const char* FragmentShaderPath = "Shaders/shader.frag";
 
 static const int SCREEN_WIDTH_16_9 = 1280;
 static const int SCREEN_HEIGHT_16_9 = 720;

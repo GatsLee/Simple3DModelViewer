@@ -6,6 +6,7 @@ Mesh::Mesh()
 	VBO = 0;
 	IBO = 0;
 	indexCount = 0;
+	logFile.open("out.txt", std::ios::out);
 }
 
 Mesh::~Mesh()
@@ -147,26 +148,73 @@ bool Mesh::LoadModel(const std::string& fileName)
 	return true;
 }
 
+bool Mesh::CreateCustomModel(GLfloat* vertices, unsigned int* indices, 
+								unsigned int numOfVertices, unsigned int numOfIndices)
+{
+	indexCount = numOfIndices;
+
+	// VAO: Vertex Array Object
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	// IBO: Index Buffer Object
+	glGenBuffers(1, &IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * numOfIndices, indices, GL_STATIC_DRAW);
+
+	// VBO: Vertex Buffer Object
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, 0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 3));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 5));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	// should unbind IBO/EBO after you unbind VAO
+	glBindVertexArray(0);
+
+	for (int i = 0; i < 4; i ++)
+	{
+		logFile << "Vertex " << i << ": " << vertices[i * 8] << " " << vertices[i * 8 + 1] << " " << vertices[i * 8 + 2] << std::endl;
+		logFile << "UV " << i << ": " << vertices[i * 8 + 3] << " " << vertices[i * 8 + 4] << std::endl;
+		logFile << "Normal " << i << ": " << vertices[i * 8 + 5] << " " << vertices[i * 8 + 6] << " " << vertices[i * 8 + 7] << std::endl << std::endl;
+	}
+
+	for (int i = 0; i < numOfIndices; i++)
+	{
+		logFile << "Index " << i << ": " << indices[i] << std::endl;
+	}
+
+	return true;
+}
+
 void Mesh::CreateMesh()
 {
-	std::vector<float> interleavedVertices;
+	int vertexIndexCount = 0;
+	std::vector<GLfloat> interleavedVertices;
 	std::vector<unsigned int> indices;
 
 	for (const Face& face : faces)
 	{
 		for (size_t i = 0; i < face.vertexIndices.size(); i++)
 		{
+			// Vertices
 			int vIdx = face.vertexIndices[i] - 1;
 			if (vIdx < 0 || vIdx >= vertices.size())
 			{
-				std::cout << "idx: " << vIdx << " vertices.size(): " << vertices.size() << std::endl; // "Error: Vertex index out of bounds
-				std::cout << "Error: Vertex index out of bounds" << std::endl;
 				continue;
 			}
 			interleavedVertices.push_back(vertices[vIdx].x);
 			interleavedVertices.push_back(vertices[vIdx].y);
 			interleavedVertices.push_back(vertices[vIdx].z);
 
+			// Texture
 			if (face.textureIndices.size() > i)
 			{
 				int uvIdx = face.textureIndices[i] - 1;
@@ -181,6 +229,7 @@ void Mesh::CreateMesh()
 					interleavedVertices.push_back(0.0f);
 				}
 			}
+			// Normals
 			if (face.normalIndices.size() > i)
 			{
 				int nIdx = face.normalIndices[i] - 1;
@@ -197,7 +246,7 @@ void Mesh::CreateMesh()
 					interleavedVertices.push_back(0.0f);
 				}
 			}
-			indices.push_back(indices.size());
+			indices.push_back(vertexIndexCount++);
 		}
 	}
 	indexCount = indices.size();
@@ -205,13 +254,13 @@ void Mesh::CreateMesh()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size() * sizeof(GLfloat), &interleavedVertices[0], GL_STATIC_DRAW);
-
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, interleavedVertices.size() * sizeof(GLfloat), interleavedVertices.data(), GL_STATIC_DRAW);
 
 	// Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
@@ -227,7 +276,6 @@ void Mesh::CreateMesh()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void Mesh::RenderMesh()

@@ -34,6 +34,8 @@ public:
 	~Mesh();
 
 	bool LoadModel(const std::string& fileName);
+	bool CreateCustomModel(GLfloat* vertices, unsigned int* indices,
+		unsigned int numOfVertices, unsigned int numOfIndices);
 
 	void CreateMesh();
 	void RenderMesh();
@@ -52,5 +54,7 @@ private:
 								unsigned int vLength, unsigned int uvLength, unsigned int normalLength);
 
 	std::vector<std::string> SplitObjLine(const std::string& s, char delimiter);
+
+	std::ofstream logFile;
 
 };

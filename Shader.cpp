@@ -178,7 +178,6 @@ bool Shader::CompileShader()
 	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
 	uniformView = glGetUniformLocation(shaderID, "view");
-	uniformEyePosition = glGetUniformLocation(shaderID, "eyePosition");
 
 	return true;
 }

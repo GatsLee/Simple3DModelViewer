@@ -14,7 +14,8 @@ Camera::Camera()
 	Update();
 }
 
-Camera::Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, float startYaw, float startPitch, float MoveSpeed, float startTurnSpeed)
+Camera::Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, 
+				float startYaw, float startPitch, float startMoveSpeed, float startTurnSpeed)
 {
 	this->position = position;
 	this->up = startUp;
@@ -22,7 +23,7 @@ Camera::Camera(GatsMath::vec3 position, GatsMath::vec3 startUp, float startYaw, 
 	this->yaw = startYaw;
 	this->pitch = startPitch;
 	this->forward = GatsMath::vec3(0.0f, 0.0f, -1.0f);
-	this->moveSpeed = MoveSpeed;
+	this->moveSpeed = startMoveSpeed;
 	this->turnSpeed = startTurnSpeed;
 
 	Update();
@@ -65,6 +66,8 @@ void Camera::KeyControl(bool* keys, GLfloat deltaTime)
 	{
 		position = position - up * velocity;
 	}
+
+	std::cout << "Camera Position: " << position.x << ", " << position.y << ", " << position.z << std::endl;
 }
 
 void Camera::MouseControl(GLfloat xChange, GLfloat yChange)

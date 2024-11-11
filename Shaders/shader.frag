@@ -13,5 +13,6 @@ uniform vec3 eyePosition;
 
 void main()
 {
-    colour = texture(theTexture, TexCoord) * vColour;
+    //colour = texture(theTexture, TexCoord) * vColour;
+    colour = vColour;
 }

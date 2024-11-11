@@ -43,7 +43,7 @@ bool Window::Initialize()
 	// Allow Forward Compatibility
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	mainWindow = glfwCreateWindow(windowWidth, windowHeight, "3D Model View by GatsLee", NULL, NULL);
+	mainWindow = glfwCreateWindow(windowWidth, windowHeight, "3D Model Viewer by GatsLee", NULL, NULL);
 	if (!mainWindow)
 	{
 		std::cout << "GLFW window creation failed!" << std::endl;
@@ -52,12 +52,15 @@ bool Window::Initialize()
 	}
 
 	// Get buffer size information
-	glfwGetFramebufferSize(mainWindow, &bufferWidth, &bufferHeight);
+	int tmpBufferWidth, tmpBufferHeight;
+	glfwGetFramebufferSize(mainWindow, &tmpBufferWidth, &tmpBufferHeight);
+	bufferHeight = static_cast<GLuint>(tmpBufferHeight);
+	bufferWidth = static_cast<GLuint>(tmpBufferWidth);
 
 	// Set context for GLEW to use
 	glfwMakeContextCurrent(mainWindow);
 
-	//createCallbacks();
+	CreateCallbacks();
 	//glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Allow modern extension features
@@ -71,20 +74,28 @@ bool Window::Initialize()
 		return false;
 	}
 
+	glEnable(GL_DEPTH_TEST);
+
 	// setup viewport size
 	glViewport(0, 0, bufferWidth, bufferHeight);
+
+	glfwSetWindowUserPointer(mainWindow, this);
 
 	return true;
 }
 
 GLfloat Window::GetXChange()
 {
-	return xChange;
+	GLfloat theChange = xChange;
+	xChange = 0.0f;
+	return theChange;
 }
 
 GLfloat Window::GetYChange()
 {
-	return yChange;
+	GLfloat theChange = yChange;
+	yChange = 0.0f;
+	return theChange;
 }
 
 void Window::CreateCallbacks()
@@ -107,10 +118,12 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 		if (action == GLFW_PRESS)
 		{
 			theWindow->keys[key] = true;
+			std::cout << "Pressed: " << key << std::endl;
 		}
 		else if (action == GLFW_RELEASE)
 		{
 			theWindow->keys[key] = false;
+			std::cout << "Released: " << key << std::endl;
 		}
 	}
 }
@@ -131,4 +144,6 @@ void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 
 	theWindow->lastX = xPos;
 	theWindow->lastY = yPos;
+
+	std::cout << theWindow->xChange << " : " << theWindow->yChange << std::endl;
 }
