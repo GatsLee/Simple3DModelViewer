@@ -6,7 +6,6 @@ Mesh::Mesh()
 	VBO = 0;
 	IBO = 0;
 	indexCount = 0;
-	logFile.open("out.txt", std::ios::out);
 }
 
 Mesh::~Mesh()
@@ -153,16 +152,13 @@ bool Mesh::CreateCustomModel(GLfloat* vertices, unsigned int* indices,
 {
 	indexCount = numOfIndices;
 
-	// VAO: Vertex Array Object
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	// IBO: Index Buffer Object
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * numOfIndices, indices, GL_STATIC_DRAW);
 
-	// VBO: Vertex Buffer Object
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * numOfVertices, vertices, GL_STATIC_DRAW);
@@ -176,20 +172,7 @@ bool Mesh::CreateCustomModel(GLfloat* vertices, unsigned int* indices,
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	// should unbind IBO/EBO after you unbind VAO
 	glBindVertexArray(0);
-
-	for (int i = 0; i < 4; i ++)
-	{
-		logFile << "Vertex " << i << ": " << vertices[i * 8] << " " << vertices[i * 8 + 1] << " " << vertices[i * 8 + 2] << std::endl;
-		logFile << "UV " << i << ": " << vertices[i * 8 + 3] << " " << vertices[i * 8 + 4] << std::endl;
-		logFile << "Normal " << i << ": " << vertices[i * 8 + 5] << " " << vertices[i * 8 + 6] << " " << vertices[i * 8 + 7] << std::endl << std::endl;
-	}
-
-	for (int i = 0; i < numOfIndices; i++)
-	{
-		logFile << "Index " << i << ": " << indices[i] << std::endl;
-	}
 
 	return true;
 }

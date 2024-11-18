@@ -51,7 +51,7 @@ bool Shader::CreateFromFiles(std::string vertexLocation, std::string fragmentLoc
 	vertexShader = ReadFile(vertexLocation);
 	fragmentShader = ReadFile(fragmentLocation);
 
-	if (vertexShader == nullptr || fragmentShader == nullptr)
+	if (vertexShader == "" || fragmentShader == "")
 	{
 		return false;
 	}
@@ -118,7 +118,7 @@ void Shader::ClearShader()
 	uniformProjection = 0;
 }
 
-char* Shader::ReadFile(std::string fileLocation)
+std::string Shader::ReadFile(std::string fileLocation)
 {
 	std::string content;
 	std::ifstream fileStream(fileLocation, std::ios::in);
@@ -138,7 +138,7 @@ char* Shader::ReadFile(std::string fileLocation)
 
 	fileStream.close();
 
-	return _strdup(content.c_str());
+	return content;
 }
 
 bool Shader::CompileShader()
@@ -151,8 +151,8 @@ bool Shader::CompileShader()
 		return false;
 	}
 
-	AddShader(shaderID, vertexShader, GL_VERTEX_SHADER);
-	AddShader(shaderID, fragmentShader, GL_FRAGMENT_SHADER);
+	AddShader(shaderID, vertexShader.c_str(), GL_VERTEX_SHADER);
+	AddShader(shaderID, fragmentShader.c_str(), GL_FRAGMENT_SHADER);
 
 	GLint result = 0;
 	GLchar eLog[1024] = { 0 };
@@ -175,8 +175,8 @@ bool Shader::CompileShader()
 		return false;
 	}
 
-	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
+	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformView = glGetUniformLocation(shaderID, "view");
 
 	return true;

@@ -10,7 +10,6 @@ public:
 	static float GetDeltaTime() { return deltaTime; }
 	static float GetTotalTime(){ return totalTimeElapsed; }
 
-private:
 	static float deltaTime;
 	static float lastTime;
 	static float totalTimeElapsed;

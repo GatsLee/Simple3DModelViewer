@@ -30,8 +30,8 @@ private:
 	GatsMath::vec3 right;
 	GatsMath::vec3 worldUp;
 
-	float yaw;
-	float pitch;
+	GLfloat yaw;
+	GLfloat pitch;
 
 	float moveSpeed;
 	float turnSpeed;

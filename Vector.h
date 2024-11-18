@@ -271,16 +271,21 @@ namespace GatsMath
 			result.x = x / length;
 			result.y = y / length;
 			result.z = z / length;
+
 			return result;
 		}
 
-		float* value_ptr()
+		template <typename T>
+		friend std::ostream &operator<<(std::ostream &os, const vec<T, 3> &v)
 		{
-			return &x;
+			os << "vec3(" << v.x << ", " << v.y << ", " << v.z << ")";
+			return os;
 		}
+
 	};
 
 
+	//vec<T, 3> operators
 	// vec<T, 3> functions
 	template<typename T>
 	float* value_ptr(const vec<T, 3>& v)
@@ -289,9 +294,9 @@ namespace GatsMath
 	}
 
 	template <typename T>
-	float dot(const vec<T, 3>& v1, const vec<T, 3>& v2)
+	T dot(const vec<T, 3>& v1, const vec<T, 3>& v2)
 	{
-		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+		return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
 	}
 
 	template <typename T>
@@ -301,6 +306,16 @@ namespace GatsMath
 		result.x = v1.y * v2.z - v1.z * v2.y;
 		result.y = v1.z * v2.x - v1.x * v2.z;
 		result.z = v1.x * v2.y - v1.y * v2.x;
+		return result;
+	}
+
+	template <typename T>
+	vec<T, 3> abs(const vec<T, 3>& v)
+	{
+		vec<T, 3> result;
+		result.x = std::abs(v.x);
+		result.y = std::abs(v.y);
+		result.z = std::abs(v.z);
 		return result;
 	}
 

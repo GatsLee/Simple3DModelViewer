@@ -30,8 +30,8 @@ public:
 	void ClearShader();
 
 private:
-	char *vertexShader;
-	char *fragmentShader;
+	std::string vertexShader;
+	std::string fragmentShader;
 
 	int pointLightCount;
 	int spotLightCount;
@@ -79,7 +79,7 @@ private:
 		GLuint uniformEdge;
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
-	char *ReadFile(std::string fileLocation);
+	std::string ReadFile(std::string fileLocation);
 	bool CompileShader();
 	void AddShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
 };

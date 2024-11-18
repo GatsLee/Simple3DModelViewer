@@ -29,7 +29,7 @@ namespace GatsMath
 		{
 			for (int i = 0; i < 4; i++)
 				for (int j = 0; j < 4; j++)
-					data[i][j] = 0;
+					data[i][j] = static_cast<T>(0);
 			data[0][0] = val;
 			data[1][1] = val;
 			data[2][2] = val;
@@ -160,12 +160,7 @@ namespace GatsMath
 	template <typename T>
 	const T* value_ptr(const mat<T, 4, 4>& m)
 	{
-		T* flatData = new T[16];
-		for (int i = 0; i < 4; i++)
-			for (int j = 0; j < 4; j++)
-				flatData[i * 4 + j] = m.data[i][j];
-
-		return flatData;
+		return &m.data[0][0];
 	}
 
 	template <typename T>
@@ -275,7 +270,10 @@ namespace GatsMath
 											vec4(0, 1, 0, v.y),
 											vec4(0, 0, 1, v.z),
 											vec4(0, 0, 0, 1));
-		return result;
+
+		mat <T, 4, 4> res = result * m;
+
+		return res;
 	}
 
 	template <typename T>
@@ -286,7 +284,8 @@ namespace GatsMath
 											vec4(0, 0, v.z, 0),
 											vec4(0, 0, 0, 1));
 
-		return result;
+		mat <T, 4, 4> res = result * m;
+		return res;
 	}
 
 	template <typename T>
@@ -300,7 +299,10 @@ namespace GatsMath
 												vec4(0, cos(angle), -sin(angle),	0),
 												vec4(0, sin(angle), cos(angle),		0),
 												vec4(0, 0,			0,				1));
-			return result;
+
+			mat<T, 4, 4> res = result * m;
+
+			return res;
 		}
 		else if (nv == vec3(0, 1, 0))
 		{
@@ -308,7 +310,9 @@ namespace GatsMath
 												vec4(0,			1,		0,		0),
 												vec4(-sin(angle), 0, cos(angle), 0),
 												vec4(0,			0,		0,		1));
-			return result;
+
+			mat<T, 4, 4> res = result * m;
+			return res;
 		}
 		else if (nv == vec3(0, 0, 1))
 		{
@@ -316,23 +320,28 @@ namespace GatsMath
 												vec4(sin(angle),	cos(angle),		0,		0),
 												vec4(0,				0,				1,		0),
 												vec4(0,				0,				0,		1));
-			return result;
+
+			mat<T, 4, 4> res = result * m;
+
+			return res;
 		}
 		else
 		{
 			T c = cos(angle);
 			T s = sin(angle);
-			T t = 1 - c;
+			T t = 1.0f - c;
 			T x = v.x;
 			T y = v.y;
 			T z = v.z;
 
-			mat<T, 4, 4> result = mat<T, 4, 4>( vec4(t * x * x + c,		t * x * y - s * z,	t * x * z + s * y,	0),
+			mat<T, 4, 4> result = mat<T, 4, 4>( vec4((t * x * x) + c,		t * x * y - s * z,	t * x * z + s * y,	0),
 												vec4(t * x * y + s * z, t * y * y + c,		t * y * z - s * x,	0),
 												vec4(t * x * z - s * y, t * y * z + s * x,	t * z * z + c,		0),
 												vec4(0,					0,					0,					1));
 
-			return result;
+			mat<T,4,4> res = result * m;
+
+			return res;
 		}
 	}
 
@@ -341,10 +350,12 @@ namespace GatsMath
 	{
 		mat<T, 4, 4> result;
 
-		result = mat<T, 4, 4>(vec4(1 / (aspect * std::tan(fov / 2)), 0, 0, 0),
-								vec4(0, 1 / std::tan(fov / 2), 0, 0),
-								vec4(0, 0, (zFar + zNear) / (zNear - zFar), -((2 * zFar * zNear) / (zFar - zNear))),
-								vec4(0, 0, -1, 0));
+		T const tanHalFovy = std::tan(fov / static_cast<T>(2));
+
+		result = mat<T, 4, 4>(vec4(static_cast<T>(1) / (aspect * tanHalFovy),			0,								0,			0),
+								vec4(0,											static_cast<T>(1) / tanHalFovy,		0,			0),
+								vec4(0,											0,								-(zFar + zNear) / (zFar - zNear),		-static_cast<T>(1)),
+								vec4(0,											0,								-((static_cast<T>(2) * zFar * zNear) / (zFar - zNear)), 0));
 
 		return result;
 	}
@@ -363,15 +374,15 @@ namespace GatsMath
 	}
 
 	template <typename T>
-	mat<T, 4, 4> lookAt(const vec<float, 3>& eye, const vec<float, 3>& center, const vec<float, 3>& up)
+	mat<T, 4, 4> lookAt(const vec<float, 3>& eye, const vec<float, 3>& target, const vec<float, 3>& up)
 	{
-		vec3 cameraZ = (eye - center).normalize();
+		vec3 cameraZ = (target - eye).normalize();
 		vec3 cameraX = cross(up, cameraZ).normalize();
 		vec3 cameraY = cross(cameraZ, cameraX);
 
-		mat<T, 4, 4> result = mat<T, 4, 4>(vec4(cameraX.x, cameraY.x, cameraZ.x, 0),
-											vec4(cameraX.y, cameraY.y, cameraZ.y, 0),
-											vec4(cameraX.z, cameraY.z, cameraZ.z, 0),
+		mat<T, 4, 4> result = mat<T, 4, 4>(vec4(cameraX.x, cameraY.x, -cameraZ.x, 0),
+											vec4(cameraX.y, cameraY.y, -cameraZ.y, 0),
+											vec4(cameraX.z, cameraY.z, -cameraZ.z, 0),
 											vec4(-dot(cameraX, eye), -dot(cameraY, eye), -dot(cameraZ, eye), 1));
 		return result;
 	}

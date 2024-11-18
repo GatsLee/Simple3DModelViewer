@@ -7,9 +7,11 @@ Window::Window(GLint width, GLint height)
 
 	lastX = 0.0f;
 	lastY = 0.0f;
+
 	xChange = 0.0f;
 	yChange = 0.0f;
-	mouseFirstMoved = false;
+
+	mouseFirstMoved = true;
 
 	for (auto& i : keys)
 	{
@@ -118,12 +120,12 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 		if (action == GLFW_PRESS)
 		{
 			theWindow->keys[key] = true;
-			std::cout << "Pressed: " << key << std::endl;
+			//std::cout << "Pressed: " << key << std::endl;
 		}
 		else if (action == GLFW_RELEASE)
 		{
 			theWindow->keys[key] = false;
-			std::cout << "Released: " << key << std::endl;
+			//std::cout << "Released: " << key << std::endl;
 		}
 	}
 }
@@ -134,16 +136,15 @@ void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 
 	if (theWindow->mouseFirstMoved)
 	{
-		theWindow->lastX = xPos;
-		theWindow->lastY = yPos;
+		theWindow->lastX = static_cast<GLfloat>(xPos);
+		theWindow->lastY = static_cast<GLfloat>(yPos);
 		theWindow->mouseFirstMoved = false;
 	}
 
-	theWindow->xChange = xPos - theWindow->lastX;
-	theWindow->yChange = theWindow->lastY - yPos;
+	theWindow->xChange = static_cast<GLfloat>(xPos) - theWindow->lastX;
+	theWindow->yChange = theWindow->lastY - static_cast<GLfloat>(yPos);
 
-	theWindow->lastX = xPos;
-	theWindow->lastY = yPos;
+	theWindow->lastX = static_cast<GLfloat>(xPos);
+	theWindow->lastY = static_cast<GLfloat>(yPos);
 
-	std::cout << theWindow->xChange << " : " << theWindow->yChange << std::endl;
 }
