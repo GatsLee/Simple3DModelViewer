@@ -117,13 +117,13 @@ void Camera::Update()
 	forward.z = std::sin(GatsMath::ToRadians(yaw)) * std::cos(GatsMath::ToRadians(pitch));
 	forward = forward.normalize();
 
-	std::cout << std::endl;
-	std::cout << "[1] Position: " << position << std::endl;
-	std::cout << "[2] Forward: " << forward << std::endl;
-	std::cout << "[3] Up: " << up << std::endl;
-	std::cout << "[4] Right: " << right << std::endl;
-	std::cout << std::endl;
+	//std::cout << std::endl;
+	//std::cout << "[1] Position: " << position << std::endl;
+	//std::cout << "[2] Forward: " << forward << std::endl;
+	//std::cout << "[3] Up: " << up << std::endl;
+	//std::cout << "[4] Right: " << right << std::endl;
+	//std::cout << std::endl;
 
-	right = GatsMath::cross(forward, worldUp).normalize();
-	up = GatsMath::cross(right, forward).normalize();
+	right = GatsMath::cross(worldUp, forward).normalize();
+	up = GatsMath::cross(forward, right).normalize();
 }

@@ -24,6 +24,10 @@ public:
 	bool LoadTextureA();
 	void UseTexture();
 	void ClearTexture();
+
+	std::string GetFileLocation() const { return fileLocation; }
+	GLuint GetTextureID() const { return textureID; }
+
 private:
 	e_fileType fileType;
 	GLuint textureID;

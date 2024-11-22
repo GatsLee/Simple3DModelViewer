@@ -3,11 +3,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <fstream>
 #include <sstream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "GatsMath.h"
+#include "Texture.h"
+#include "Material.h"
 
 struct Vertex {
 	float x, y, z;
@@ -22,6 +25,7 @@ struct Normal {
 };
 
 struct Face {
+	std::string activeMaterial;         // Active material
 	std::vector<int> vertexIndices;     // Indices for vertices
 	std::vector<int> textureIndices;    // Indices for texture coordinates
 	std::vector<int> normalIndices;     // Indices for normals
@@ -33,22 +37,27 @@ public:
 	Mesh();
 	~Mesh();
 
-	bool LoadModel(const std::string& fileName);
-	bool CreateCustomModel(GLfloat* vertices, unsigned int* indices,
-		unsigned int numOfVertices, unsigned int numOfIndices);
+	bool LoadObj(const std::string& fileName);
+	//bool CreateCustomModel(GLfloat* vertices, unsigned int* indices,
+	//	unsigned int numOfVertices, unsigned int numOfIndices);
 
-	void CreateMesh();
-	void RenderMesh();
+	void CreateMesh(const std::unordered_map<std::string, Texture*>& textures, 
+						const std::unordered_map<std::string, struct Material*>& materials);
+	void RenderMesh(const std::unordered_map<std::string, Texture*>& textures, 
+						const std::unordered_map<std::string, struct Material*>& materials);
 	void ClearMesh();
 
 private:
-	GLuint VAO, VBO, IBO;
-	GLsizei indexCount;
 
 	std::vector<Vertex> vertices;
 	std::vector<TextureCoord> uvs;
 	std::vector<Normal> normals;
 	std::vector<Face> faces;
+
+	std::unordered_map<std::string, GLfloat> materialVAOs;
+	std::unordered_map<std::string, GLfloat> materialVBOs;
+	std::unordered_map<std::string, GLfloat> materialIBOs;
+	std::unordered_map<std::string, GLsizei> materialIndexCounts;
 
 	void CalculateAverageNormals(unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount, 
 								unsigned int vLength, unsigned int uvLength, unsigned int normalLength);

@@ -383,7 +383,7 @@ namespace GatsMath
 		mat<T, 4, 4> result = mat<T, 4, 4>(vec4(cameraX.x, cameraY.x, -cameraZ.x, 0),
 											vec4(cameraX.y, cameraY.y, -cameraZ.y, 0),
 											vec4(cameraX.z, cameraY.z, -cameraZ.z, 0),
-											vec4(-dot(cameraX, eye), -dot(cameraY, eye), -dot(cameraZ, eye), 1));
+											vec4(-dot(cameraX, eye), -dot(cameraY, eye), dot(cameraZ, eye), 1));
 		return result;
 	}
 
