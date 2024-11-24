@@ -182,10 +182,9 @@ bool Mesh::LoadObj(const std::string& fileName)
 //	return true;
 //}
 
-void Mesh::CreateMesh(const std::unordered_map<std::string, Texture*>& textures,
-							const std::unordered_map<std::string, struct Material*>& materials)
+void Mesh::CreateMesh()
 {
-	int vertexIndexCount = 0;
+	int vertexBufferIndex = 0;
 	std::unordered_map<std::string, std::vector<GLfloat>> interleavedVerticesPerMaterial = {};
 	std::unordered_map<std::string, std::vector<unsigned int>> indicesPerMaterial = {};
 
@@ -237,7 +236,7 @@ void Mesh::CreateMesh(const std::unordered_map<std::string, Texture*>& textures,
 					interleavedVerticesPerMaterial[activeMaterial].push_back(0.0f);
 				}
 			}
-			indicesPerMaterial[activeMaterial].push_back(vertexIndexCount++);
+			indicesPerMaterial[activeMaterial].push_back(vertexBufferIndex++);
 		}
 	}
 
@@ -250,14 +249,14 @@ void Mesh::CreateMesh(const std::unordered_map<std::string, Texture*>& textures,
 		glGenVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
 
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
-
 		glGenBuffers(1, &IBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesPerMaterial[materialName].size() * sizeof(unsigned int),
 			indicesPerMaterial[materialName].data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 
 		// Define vertex attributes
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
@@ -279,27 +278,43 @@ void Mesh::CreateMesh(const std::unordered_map<std::string, Texture*>& textures,
 	}
 }
 
-void Mesh::RenderMesh(const std::unordered_map<std::string, Texture*>& textures,
-	const std::unordered_map<std::string, struct Material*>& materials)
+void Mesh::RenderMesh(std::unordered_map<std::string, Texture*>& textures,
+						std::unordered_map<std::string, GLuint>& textureUnits,
+						std::unordered_map<std::string, struct Material*>& materials, Shader *shader)
 {
 	for (const auto &pair : materialVAOs)
 	{
 		std::string materialName = pair.first;
-		GLuint VAO = materialVAOs[materialName];
+		GLuint VAO = pair.second;
 		// Retrieve material and bind its textures
 		if (materials.find(materialName) != materials.end())
 		{
-			Material* material = materials.at(materialName);
-
-			if (textures.find(material->diffuseTexture) != textures.end())
+			Material* material = materials[materialName];
+			if (materialName != "" && textures.find("Models/" + material->diffuseTexture) != textures.end())
 			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, textures.at(material->diffuseTexture)->GetTextureID());
+				textures["Models/" + material->diffuseTexture]->UseTexture(textureUnits[material->diffuseTexture]);
+				shader->SetUseDefaultColour(false);
+				shader->SetTexture(textureUnits[material->diffuseTexture]);
+
+				std::cout << "Material: " << materialName << std::endl;
+				std::cout << "textureUnits[material->diffuseTexture]: " << textureUnits[material->diffuseTexture] << std::endl;
+				std::cout << "textures[material->diffuseTexture]: " << textures["Models/" + material->diffuseTexture] << std::endl;
+			}
+			else
+			{
+				shader->SetUseDefaultColour(true);
 			}
 		}
-		// Bind VAO and render
+		else
+		{
+			//std::cout << "Material not found: " << materialName << std::endl;
+			shader->SetUseDefaultColour(true);
+		}
+
 		glBindVertexArray(VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, materialIBOs[materialName]);
 		glDrawElements(GL_TRIANGLES, materialIndexCounts[materialName], GL_UNSIGNED_INT, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 }

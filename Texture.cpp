@@ -12,6 +12,7 @@ Texture::Texture()
 Texture::Texture(std::string fileLocation, std::string fileType)
 {
 	this->fileLocation = fileLocation;
+	this->fileName = fileLocation.substr(fileLocation.find_last_of("/\\") + 1);
 	if (fileType == "bmp")
 	{
 		this->fileType = BMP;
@@ -88,9 +89,9 @@ bool Texture::LoadTextureA()
 	return false;
 }
 
-void Texture::UseTexture()
+void Texture::UseTexture(GLuint textureUnit)
 {
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 

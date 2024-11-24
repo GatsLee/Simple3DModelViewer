@@ -15,16 +15,17 @@ public:
 
 	bool CreateFromFiles(std::string vertexLocation, std::string fragmentLocation);
 
+	GLuint GetShaderID() const { return shaderID; }
+
 	GLuint GetModelLocation();
 	GLuint GetProjectionLocation();
 	GLuint GetViewLocation();
-	GLuint GetAmbientIntensityLocation();
-	GLuint GetAmbientColourLocation();
-	GLuint GetDiffuseIntensityLocation();
-	GLuint GetDirectionLocation();
-	GLuint GetEyePositionLocation();
-	//GLuint GetSpecularIntensityLocation();
-	//GLuint GetShininessLocation();
+	GLuint GetDiffuseTextureSamplerLocation();
+	GLuint GetUseDefaultColorLocation();
+	GLuint GetActiveTextureIndexLocation();
+
+	void SetUseDefaultColour(bool useDefaultColour);
+	void SetTexture(GLuint textureUnit);
 
 	void UseShader();
 	void ClearShader();
@@ -36,48 +37,12 @@ private:
 	int pointLightCount;
 	int spotLightCount;
 
-	GLuint shaderID, uniformProjection, uniformModel, uniformView,
-		uniformEyePosition, uniformSpecularIntensity, uniformShininess;
+	GLuint shaderID, uniformProjection, uniformModel, uniformView;
 
-	struct
-	{
-		GLuint uniformColour;
-		GLuint uniformAmbientIntensity;
-		GLuint uniformDiffuseIntensity;
+	GLuint uniformDiffuseTextureSampler;
+	//GLuint uniformActiveTextureIndex;
 
-		GLuint uniformDirection;
-	} uniformDirectionalLight;
-
-	GLuint uniformPointLightCount;
-
-	struct
-	{
-		GLuint uniformColour;
-		GLuint uniformAmbientIntensity;
-		GLuint uniformDiffuseIntensity;
-
-		GLuint uniformPosition;
-		GLuint uniformConstant;
-		GLuint uniformLinear;
-		GLuint uniformExponent;
-	} uniformPointLight[MAX_POINT_LIGHTS];
-
-	GLuint uniformSpotLightCount;
-
-	struct
-	{
-		GLuint uniformColour;
-		GLuint uniformAmbientIntensity;
-		GLuint uniformDiffuseIntensity;
-
-		GLuint uniformPosition;
-		GLuint uniformConstant;
-		GLuint uniformLinear;
-		GLuint uniformExponent;
-
-		GLuint uniformDirection;
-		GLuint uniformEdge;
-	} uniformSpotLight[MAX_SPOT_LIGHTS];
+	GLuint uniformUseDefaultColor;
 
 	std::string ReadFile(std::string fileLocation);
 	bool CompileShader();

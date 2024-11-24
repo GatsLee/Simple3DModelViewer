@@ -65,11 +65,16 @@ int main()
 		return 1;
 	}
 
+	// Load Shader
+	Shader* shader = new Shader();
+	shader->CreateFromFiles(VertexShaderPath, FragmentShaderPath);
+	shaderList.push_back(shader);
+
 	// Load Model
 	std::vector<std::string> textFilePath = { texture1Path, texture2Path, texture3Path, 
 													texture4Path, texture5Path };
 
-	Model* model = new Model(ModelPath, MtlPath, textFilePath);
+	Model* model = new Model(ModelPath, MtlPath, textFilePath, shaderList.front());
 	if (model->isModelLoaded() == false)
 	{
 		std::cout << "Model loading failed!" << std::endl;
@@ -78,20 +83,17 @@ int main()
 	modelList.push_back(model);
 	modelList[0]->CreateModel();
 	
-	// Load Shader
-	Shader* shader = new Shader();
-	shader->CreateFromFiles(VertexShaderPath, FragmentShaderPath);
-	shaderList.push_back(shader);
 
 	// Load Camera
 	Camera mainCamera = Camera(GatsMath::vec3(0.0f, 0.0f, 2.0f), GatsMath::vec3(0.0f, 1.0f, 0.0f), 
-						-90.0f, 0.0f, 1.0f, 0.5f);
+						-90.0f, 0.0f, 1.0f, 0.1f);
 
 	Time::lastTime = glfwGetTime();
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
 	GatsMath::mat4 projection = GatsMath::perspective<float>(GatsMath::ToRadians(45.0f), 
 									(GLfloat)mainWindow.GetBufferWidth() / (GLfloat)mainWindow.GetBufferHeight(), 0.1f, 100.0f);
 
+	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(mainWindow.GetGLFWWindow()))
 	{
 		Time::UpdateTime();
@@ -110,8 +112,6 @@ int main()
 		GLuint uniformProjection = shaderList[0]->GetProjectionLocation();
 		GLuint uniformView = shaderList[0]->GetViewLocation();
 
-
-
 		GatsMath::mat4 model(1.0f);
 		model = GatsMath::translate<float>(model, GatsMath::vec3(0.0f, 0.0f, -1.0f));
 		model = GatsMath::scale<float>(model, GatsMath::vec3(0.3f, 0.3f, 0.3f));
@@ -122,7 +122,6 @@ int main()
 		modelList[0]->RenderModel();
 
 		glUseProgram(0);
-
 		glfwSwapBuffers(mainWindow.GetGLFWWindow());
 	}
 

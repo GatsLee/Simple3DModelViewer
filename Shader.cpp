@@ -8,38 +8,6 @@ Shader::Shader()
 	uniformModel = 0;
 	uniformProjection = 0;
 	uniformView = 0;
-	uniformEyePosition = 0;
-	uniformSpecularIntensity = 0;
-	uniformShininess = 0;
-
-	uniformDirectionalLight.uniformColour = 0;
-	uniformDirectionalLight.uniformAmbientIntensity = 0;
-	uniformDirectionalLight.uniformDiffuseIntensity = 0;
-	uniformDirectionalLight.uniformDirection = 0;
-
-	for (size_t i = 0; i < MAX_POINT_LIGHTS; i++)
-	{
-		uniformPointLight[i].uniformColour = 0;
-		uniformPointLight[i].uniformAmbientIntensity = 0;
-		uniformPointLight[i].uniformDiffuseIntensity = 0;
-		uniformPointLight[i].uniformPosition = 0;
-		uniformPointLight[i].uniformConstant = 0;
-		uniformPointLight[i].uniformLinear = 0;
-		uniformPointLight[i].uniformExponent = 0;
-	}
-
-	for (size_t i = 0; i < MAX_SPOT_LIGHTS; i++)
-	{
-		uniformSpotLight[i].uniformColour = 0;
-		uniformSpotLight[i].uniformAmbientIntensity = 0;
-		uniformSpotLight[i].uniformDiffuseIntensity = 0;
-		uniformSpotLight[i].uniformPosition = 0;
-		uniformSpotLight[i].uniformConstant = 0;
-		uniformSpotLight[i].uniformLinear = 0;
-		uniformSpotLight[i].uniformExponent = 0;
-		uniformSpotLight[i].uniformDirection = 0;
-		uniformSpotLight[i].uniformEdge = 0;
-	}
 }
 
 Shader::~Shader()
@@ -76,29 +44,24 @@ GLuint Shader::GetViewLocation()
 	return uniformView;
 }
 
-GLuint Shader::GetAmbientIntensityLocation()
+GLuint Shader::GetDiffuseTextureSamplerLocation()
 {
-	return uniformDirectionalLight.uniformAmbientIntensity;
+	return uniformDiffuseTextureSampler;
 }
 
-GLuint Shader::GetAmbientColourLocation()
+GLuint Shader::GetUseDefaultColorLocation()
 {
-	return uniformDirectionalLight.uniformColour;
+	return uniformUseDefaultColor;
 }
 
-GLuint Shader::GetDiffuseIntensityLocation()
+void Shader::SetUseDefaultColour(bool useDefaultColour)
 {
-	return uniformDirectionalLight.uniformDiffuseIntensity;
+	glUniform1i(uniformUseDefaultColor, useDefaultColour);
 }
 
-GLuint Shader::GetDirectionLocation()
+void Shader::SetTexture(GLuint textureUnit)
 {
-	return uniformDirectionalLight.uniformDirection;
-}
-
-GLuint Shader::GetEyePositionLocation()
-{
-	return uniformEyePosition;
+	glUniform1i(uniformDiffuseTextureSampler, textureUnit);
 }
 
 void Shader::UseShader()
@@ -178,6 +141,9 @@ bool Shader::CompileShader()
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
 	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformView = glGetUniformLocation(shaderID, "view");
+	uniformDiffuseTextureSampler = glGetUniformLocation(shaderID, "diffuseTexture");
+	uniformUseDefaultColor = glGetUniformLocation(shaderID, "useDefaultColour");
+	//uniformActiveTextureIndex = glGetUniformLocation(shaderID, "activeTextureIndex");
 
 	return true;
 }

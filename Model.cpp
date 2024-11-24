@@ -1,7 +1,8 @@
 #include "Model.h"
 
 Model::Model(const std::string& objFileLoc, const std::string& mtlFileLoc, 
-				const std::vector<std::string>& textureFileLocs)
+				const std::vector<std::string>& textureFileLocs, Shader *shaderToAdjust)
+	: shader(shaderToAdjust)
 {
 	// Load the Mesh
 	meshProp = new Mesh();
@@ -27,6 +28,7 @@ Model::Model(const std::string& objFileLoc, const std::string& mtlFileLoc,
 
 	textureFileLocations = textureFileLocs;
 	areTexturesLoaded = true;
+	int textureUnit = 0;
 	// Load the Textures
 	for (auto textureFile : textureFileLocations)
 	{
@@ -34,6 +36,8 @@ Model::Model(const std::string& objFileLoc, const std::string& mtlFileLoc,
 		if (texture->LoadTexture())
 		{
 			textures[textureFile] = texture;
+			textureUnits[texture->GetFileName()] = textureUnit;
+			textureUnit++;
 		}
 		else
 		{
@@ -76,17 +80,12 @@ bool Model::isModelLoaded() const
 
 void Model::CreateModel()
 {
-	meshProp->CreateMesh(textures, materials);
-	//for (auto texture : textures)
-	//{
-	//	texture.second->LoadTexture();
-	//}
+	meshProp->CreateMesh();
 }
 
 void Model::RenderModel()
 {
-	// parameter: material map, texture map, texture id
-	meshProp->RenderMesh(textures, materials);
+	meshProp->RenderMesh(textures, textureUnits, materials, shader);
 }
 
 void Model::ClearModel()
@@ -125,7 +124,6 @@ bool Model::LoadMTLFile()
 			{
 				materials[material->name] = material;
 			}
-			delete material;
 			material = new Material();
 			ss >> material->name;
 		}
@@ -155,8 +153,6 @@ bool Model::LoadMTLFile()
 	{
 		materials[material->name] = material;
 	}
-
-	delete material;
 	file.close();
 	return true;
 }

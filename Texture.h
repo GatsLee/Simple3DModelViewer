@@ -22,10 +22,11 @@ public:
 
 	bool LoadTexture();
 	bool LoadTextureA();
-	void UseTexture();
+	void UseTexture(GLuint textureUnit);
 	void ClearTexture();
 
 	std::string GetFileLocation() const { return fileLocation; }
+	std::string GetFileName() const { return fileName; }
 	GLuint GetTextureID() const { return textureID; }
 
 private:
@@ -36,6 +37,7 @@ private:
 	unsigned char* textureData;
 
 	std::string fileLocation;
+	std::string fileName;
 
 	unsigned char* ProcessBitMap();
 };
