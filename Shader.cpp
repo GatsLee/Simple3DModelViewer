@@ -54,6 +54,11 @@ GLuint Shader::GetUseDefaultColorLocation()
 	return uniformUseDefaultColor;
 }
 
+GLuint Shader::GetActiveTextureIndexLocation()
+{
+	return uniformActiveTextureIndex;
+}
+
 void Shader::SetUseDefaultColour(bool useDefaultColour)
 {
 	glUniform1i(uniformUseDefaultColor, useDefaultColour);
@@ -62,6 +67,11 @@ void Shader::SetUseDefaultColour(bool useDefaultColour)
 void Shader::SetTexture(GLuint textureUnit)
 {
 	glUniform1i(uniformDiffuseTextureSampler, textureUnit);
+}
+
+void Shader::SetTextureIndex(int index)
+{
+	glUniform1i(uniformActiveTextureIndex, index);
 }
 
 void Shader::UseShader()
@@ -143,7 +153,7 @@ bool Shader::CompileShader()
 	uniformView = glGetUniformLocation(shaderID, "view");
 	uniformDiffuseTextureSampler = glGetUniformLocation(shaderID, "diffuseTexture");
 	uniformUseDefaultColor = glGetUniformLocation(shaderID, "useDefaultColour");
-	//uniformActiveTextureIndex = glGetUniformLocation(shaderID, "activeTextureIndex");
+	uniformActiveTextureIndex = glGetUniformLocation(shaderID, "activeTextureIndex");
 
 	return true;
 }

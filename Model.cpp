@@ -28,7 +28,7 @@ Model::Model(const std::string& objFileLoc, const std::string& mtlFileLoc,
 
 	textureFileLocations = textureFileLocs;
 	areTexturesLoaded = true;
-	int textureUnit = 0;
+	int textureUnit = 1;
 	// Load the Textures
 	for (auto textureFile : textureFileLocations)
 	{
@@ -36,6 +36,7 @@ Model::Model(const std::string& objFileLoc, const std::string& mtlFileLoc,
 		if (texture->LoadTexture())
 		{
 			textures[textureFile] = texture;
+			textures[textureFile]->UseTexture(GL_TEXTURE0 + textureUnit);
 			textureUnits[texture->GetFileName()] = textureUnit;
 			textureUnit++;
 		}
@@ -80,7 +81,7 @@ bool Model::isModelLoaded() const
 
 void Model::CreateModel()
 {
-	meshProp->CreateMesh();
+	meshProp->CreateMesh(textures, textureUnits, materials);
 }
 
 void Model::RenderModel()

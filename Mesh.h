@@ -42,7 +42,9 @@ public:
 	//bool CreateCustomModel(GLfloat* vertices, unsigned int* indices,
 	//	unsigned int numOfVertices, unsigned int numOfIndices);
 
-	void CreateMesh();
+	void CreateMesh(std::unordered_map<std::string, Texture*>& textures,
+						std::unordered_map<std::string, GLuint>& textureUnits,
+						std::unordered_map<std::string, struct Material*>& materials);
 	void RenderMesh(std::unordered_map<std::string, Texture*>& textures, 
 						std::unordered_map<std::string, GLuint>& textureUnits,
 						std::unordered_map<std::string, struct Material*>& materials, Shader *shader);

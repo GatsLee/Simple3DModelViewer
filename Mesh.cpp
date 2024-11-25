@@ -182,7 +182,9 @@ bool Mesh::LoadObj(const std::string& fileName)
 //	return true;
 //}
 
-void Mesh::CreateMesh()
+void Mesh::CreateMesh(std::unordered_map<std::string, Texture*>& textures,
+	std::unordered_map<std::string, GLuint>& textureUnits,
+	std::unordered_map<std::string, struct Material*>& materials)
 {
 	int vertexBufferIndex = 0;
 	std::unordered_map<std::string, std::vector<GLfloat>> interleavedVerticesPerMaterial = {};
@@ -268,13 +270,16 @@ void Mesh::CreateMesh()
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 5));
 		glEnableVertexAttribArray(2);
 
-		glBindVertexArray(0);
 
 		// Store VAO and material association
 		materialVAOs[materialName] = VAO;
 		materialVBOs[materialName] = VBO;
 		materialIBOs[materialName] = IBO;
 		materialIndexCounts[materialName] = indicesPerMaterial[materialName].size();
+
+		// Unbind buffers
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 	}
 }
 
@@ -282,10 +287,14 @@ void Mesh::RenderMesh(std::unordered_map<std::string, Texture*>& textures,
 						std::unordered_map<std::string, GLuint>& textureUnits,
 						std::unordered_map<std::string, struct Material*>& materials, Shader *shader)
 {
+	std::cout << "materialVAOs size: " << materialVAOs.size() << std::endl;
 	for (const auto &pair : materialVAOs)
 	{
 		std::string materialName = pair.first;
 		GLuint VAO = pair.second;
+
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, materialIBOs[materialName]);
 		// Retrieve material and bind its textures
 		if (materials.find(materialName) != materials.end())
 		{
@@ -295,10 +304,7 @@ void Mesh::RenderMesh(std::unordered_map<std::string, Texture*>& textures,
 				textures["Models/" + material->diffuseTexture]->UseTexture(textureUnits[material->diffuseTexture]);
 				shader->SetUseDefaultColour(false);
 				shader->SetTexture(textureUnits[material->diffuseTexture]);
-
-				std::cout << "Material: " << materialName << std::endl;
-				std::cout << "textureUnits[material->diffuseTexture]: " << textureUnits[material->diffuseTexture] << std::endl;
-				std::cout << "textures[material->diffuseTexture]: " << textures["Models/" + material->diffuseTexture] << std::endl;
+				//shader->SetTextureIndex(textureUnits[material->diffuseTexture]);
 			}
 			else
 			{
@@ -310,9 +316,7 @@ void Mesh::RenderMesh(std::unordered_map<std::string, Texture*>& textures,
 			//std::cout << "Material not found: " << materialName << std::endl;
 			shader->SetUseDefaultColour(true);
 		}
-
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, materialIBOs[materialName]);
+		int boundID = 0;
 		glDrawElements(GL_TRIANGLES, materialIndexCounts[materialName], GL_UNSIGNED_INT, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);

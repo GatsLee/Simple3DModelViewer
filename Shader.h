@@ -26,6 +26,7 @@ public:
 
 	void SetUseDefaultColour(bool useDefaultColour);
 	void SetTexture(GLuint textureUnit);
+	void SetTextureIndex(int index);
 
 	void UseShader();
 	void ClearShader();
@@ -40,7 +41,7 @@ private:
 	GLuint shaderID, uniformProjection, uniformModel, uniformView;
 
 	GLuint uniformDiffuseTextureSampler;
-	//GLuint uniformActiveTextureIndex;
+	GLuint uniformActiveTextureIndex;
 
 	GLuint uniformUseDefaultColor;
 
