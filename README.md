@@ -30,8 +30,8 @@
 
 ### Screenshots
 
-![Screenshot](https://github.com/GatsLee/Simple3DModelViewer/blob/master/Screenshots/ScreenShot1.png)
-![Screenshot](https://github.com/GatsLee/Simple3DModelViewer/blob/master/Screenshots/ScreenShot2.png)
+![Screenshot](https://github.com/GatsLee/Simple3DModelViewer/blob/master/ScreenShots/ScreenShot1.png)
+![Screenshot](https://github.com/GatsLee/Simple3DModelViewer/blob/master/ScreenShots/ScreenShot2.png)
 
 ### Things to improve
 
